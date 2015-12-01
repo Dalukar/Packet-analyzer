@@ -31,6 +31,7 @@
             this.devicesList = new System.Windows.Forms.ComboBox();
             this.logBox = new System.Windows.Forms.RichTextBox();
             this.buttonStart = new System.Windows.Forms.Button();
+            this.buttonStop = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // devicesList
@@ -44,6 +45,7 @@
             // logBox
             // 
             this.logBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.logBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.logBox.Location = new System.Drawing.Point(12, 105);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
@@ -61,11 +63,22 @@
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
+            // buttonStop
+            // 
+            this.buttonStop.Location = new System.Drawing.Point(199, 39);
+            this.buttonStop.Name = "buttonStop";
+            this.buttonStop.Size = new System.Drawing.Size(144, 36);
+            this.buttonStop.TabIndex = 3;
+            this.buttonStop.Text = "Stop";
+            this.buttonStop.UseVisualStyleBackColor = true;
+            this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1225, 498);
+            this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.logBox);
             this.Controls.Add(this.devicesList);
@@ -81,6 +94,7 @@
         private System.Windows.Forms.ComboBox devicesList;
         private System.Windows.Forms.RichTextBox logBox;
         private System.Windows.Forms.Button buttonStart;
+        private System.Windows.Forms.Button buttonStop;
     }
 }
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpPcap;
 using System.Threading;
+using System.Collections;
 
 namespace Packet_analyzer
 {
@@ -16,19 +17,17 @@ namespace Packet_analyzer
     {
         public Thread captureThread;
         CaptureDeviceList devices;
+        List<PacketDotNet.Packet> packets = new List<PacketDotNet.Packet>();
         public Form1()
         {
             InitializeComponent();
 
             string ver = SharpPcap.Version.VersionString;
-            /* Print SharpPcap version */
             SafeLog("SharpPcap " + ver);
             SafeLog("");
 
-            /* Retrieve the device list */
             devices = CaptureDeviceList.Instance;
             devicesList.DataSource = devices;
-            /*If no device exists, print error */
             if (devices.Count < 1)
             {
                 SafeLog("No device found on this machine");
@@ -57,9 +56,9 @@ namespace Packet_analyzer
                 System.Net.IPAddress dstIp = ipPacket.DestinationAddress;
                 int srcPort = tcpPacket.SourcePort;
                 int dstPort = tcpPacket.DestinationPort;
-
-                SafeLog(time.Hour + ":" + time.Minute + ":" + time.Second + "," + time.Millisecond + " Len=" + len + " " +
-                    srcIp + ":" + srcPort + " -> " + dstIp + ":" + dstPort);
+                packets.Add(packet);
+                SafeLog(time.Hour + ":" + time.Minute + ":" + time.Second + "," + time.Millisecond + "\tLen=" + len + " " +
+                    srcIp + ":" + srcPort + " -> " + dstIp + ":" + dstPort + " \n" + packet.PrintHex());
             }
         }
 
@@ -88,17 +87,14 @@ namespace Packet_analyzer
         {
             var device = devices[devicesList.SelectedIndex];
 
-            //Register our handler function to the 'packet arrival' event
             device.OnPacketArrival -= 
                 new PacketArrivalEventHandler(device_OnPacketArrival); //надеюсь это работает
             device.OnPacketArrival +=
                 new PacketArrivalEventHandler(device_OnPacketArrival);
 
-            // Open the device for capturing
             int readTimeoutMilliseconds = 1000;
             device.Open(DeviceMode.Promiscuous, readTimeoutMilliseconds);
 
-            //tcpdump filter to capture only TCP/IP packets
             string filter = "ip and tcp";
             device.Filter = filter;
 
@@ -108,13 +104,21 @@ namespace Packet_analyzer
             SafeLog
                 ("-- Listening on " + device.Description);
 
-            // Start capture 'INFINTE' number of packets
             if (captureThread != null)
             {
                 captureThread.Abort();
             }
             captureThread = new Thread(() => StartCapture(device));
             captureThread.Start();
+        }
+
+        private void buttonStop_Click(object sender, EventArgs e)
+        {
+            if (captureThread != null)
+            {
+                captureThread.Abort();
+            }
+
         }
     }
 }
