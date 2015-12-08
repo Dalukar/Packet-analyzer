@@ -25,14 +25,19 @@ namespace Packet_analyzer
             string ver = SharpPcap.Version.VersionString;
             SafeLog("SharpPcap " + ver);
             SafeLog("");
-
             devices = CaptureDeviceList.Instance;
-            devicesList.DataSource = devices;
             if (devices.Count < 1)
             {
                 SafeLog("No device found on this machine");
                 return;
             }
+            String[] devNames = new String[devices.Count];
+            for(int i = 0; i < devNames.Length; i++)
+            {
+                devNames[i] = devices[i].Description;
+            }
+            devicesList.DataSource = devNames;
+
  
         }
 
@@ -57,8 +62,8 @@ namespace Packet_analyzer
                 int srcPort = tcpPacket.SourcePort;
                 int dstPort = tcpPacket.DestinationPort;
                 packets.Add(packet);
-                SafeLog(time.Hour + ":" + time.Minute + ":" + time.Second + "," + time.Millisecond + "\tLen=" + len + " " +
-                    srcIp + ":" + srcPort + " -> " + dstIp + ":" + dstPort + " \n" + packet.PrintHex());
+                SafeLog("Len: " + len + "\t" + srcIp + ":" + srcPort + "\t->\t" + dstIp + ":" + dstPort + "\t seq: "+ tcpPacket.SequenceNumber + "\t ack: " + tcpPacket.AcknowledgmentNumber);
+                 //" \n" packet.PrintHex()
             }
         }
 

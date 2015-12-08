@@ -32,40 +32,41 @@
             this.logBox = new System.Windows.Forms.RichTextBox();
             this.buttonStart = new System.Windows.Forms.Button();
             this.buttonStop = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // devicesList
             // 
             this.devicesList.FormattingEnabled = true;
-            this.devicesList.Location = new System.Drawing.Point(12, 12);
+            this.devicesList.Location = new System.Drawing.Point(65, 12);
             this.devicesList.Name = "devicesList";
-            this.devicesList.Size = new System.Drawing.Size(1177, 21);
+            this.devicesList.Size = new System.Drawing.Size(531, 21);
             this.devicesList.TabIndex = 0;
             // 
             // logBox
             // 
             this.logBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.logBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.logBox.Location = new System.Drawing.Point(12, 105);
+            this.logBox.Location = new System.Drawing.Point(12, 60);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(1208, 381);
+            this.logBox.Size = new System.Drawing.Size(1208, 426);
             this.logBox.TabIndex = 1;
             this.logBox.Text = "";
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(12, 39);
+            this.buttonStart.Location = new System.Drawing.Point(906, 3);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(164, 36);
             this.buttonStart.TabIndex = 2;
-            this.buttonStart.Text = "Start scaner";
+            this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
             // 
             // buttonStop
             // 
-            this.buttonStop.Location = new System.Drawing.Point(199, 39);
+            this.buttonStop.Location = new System.Drawing.Point(1076, 3);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(144, 36);
             this.buttonStop.TabIndex = 3;
@@ -73,11 +74,21 @@
             this.buttonStop.UseVisualStyleBackColor = true;
             this.buttonStop.Click += new System.EventHandler(this.buttonStop_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(47, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Adapter:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1225, 498);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonStop);
             this.Controls.Add(this.buttonStart);
             this.Controls.Add(this.logBox);
@@ -86,6 +97,7 @@
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -95,6 +107,7 @@
         private System.Windows.Forms.RichTextBox logBox;
         private System.Windows.Forms.Button buttonStart;
         private System.Windows.Forms.Button buttonStop;
+        private System.Windows.Forms.Label label1;
     }
 }
 
