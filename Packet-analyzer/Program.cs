@@ -12,13 +12,16 @@ namespace Packet_analyzer
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        public static PacketAnalyzer Analyzer;
         [STAThread]
         static void Main()
         {
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Form1 form = new Form1();
+            Analyzer = new PacketAnalyzer(form);
+            Application.Run(form);
         }
-
     }
 }
