@@ -9,7 +9,7 @@ namespace Packet_analyzer
     interface PacketAnalyzerFormInterface
     {
         string hostText { get; set; }
-        void LogBps(long bps);
+        void LogBps(long bpsIn, long bpsOut);
         void logText(string text);
         void SetDevicesNames(string[] devices);
     }

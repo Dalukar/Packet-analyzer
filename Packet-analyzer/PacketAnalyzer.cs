@@ -17,13 +17,15 @@ namespace Packet_analyzer
         Thread bpsThread;
         CaptureDeviceList devices;
         public String[] devNames;
-        List<PacketDotNet.Packet> packets = new List<PacketDotNet.Packet>();
+        List<TcpConnectionDump> sessions = new List<TcpConnectionDump>();
         System.Net.IPAddress remoteIP;
+
         Stopwatch globalWatch = new Stopwatch();
         Stopwatch stopWatch = new Stopwatch();
         uint prevSeq = 0;
         long delay = 0;
-        long bps = 0;
+        long bpsIn = 0;
+        long bpsOut = 0;
 
         public PacketAnalyzer(PacketAnalyzerFormInterface form)
         {
@@ -69,7 +71,16 @@ namespace Packet_analyzer
             if (captureThread != null){captureThread.Abort();}
             if (bpsThread != null){bpsThread.Abort();}
             captureThread = new Thread(() => device.Capture());
-            bpsThread = new Thread(() => { while (true) { form.LogBps(bps); bps = 0; Thread.Sleep(1000); } });
+            bpsThread = new Thread(() => 
+                { 
+                    while (true) 
+                    { 
+                        form.LogBps(bpsIn, bpsOut); 
+                        bpsIn = 0;
+                        bpsOut = 0;
+                        Thread.Sleep(1000); 
+                    }
+                });
             bpsThread.Start();
             stopWatch.Start();
             globalWatch.Start();
@@ -90,12 +101,17 @@ namespace Packet_analyzer
                 System.Net.IPAddress srcIp = ipPacket.SourceAddress;
                 System.Net.IPAddress dstIp = ipPacket.DestinationAddress;
 
-                bps += len;
                 delay = -1;
                 if (dstIp.ToString() == remoteIP.ToString())
                 {
                     prevSeq = tcpPacket.AcknowledgmentNumber;
                     stopWatch.Restart();
+                    bpsOut += len;
+
+                }
+                else
+                {
+                    bpsIn += len;
                 }
 
                 if (srcIp.ToString() == remoteIP.ToString() && tcpPacket.SequenceNumber == prevSeq)
@@ -106,9 +122,26 @@ namespace Packet_analyzer
 
                 int srcPort = tcpPacket.SourcePort;
                 int dstPort = tcpPacket.DestinationPort;
-                packets.Add(packet);
+                uint[] rel= new uint[2];
+                bool isSessionExist = false;
+                foreach(TcpConnectionDump dump in sessions)
+                {
+                    if (dump.isEqual(srcIp.ToString(), srcPort, dstIp.ToString(), dstPort))
+                    {
+                        rel = dump.AddPacket(tcpPacket, srcIp.ToString());
+                        isSessionExist = true;
+                        break;
+                    }
+
+                }
+                if (!isSessionExist)
+                {
+                    sessions.Add(new TcpConnectionDump(srcIp.ToString(), srcPort, dstIp.ToString(), dstPort, tcpPacket.SequenceNumber, tcpPacket.AcknowledgmentNumber));
+                }
+                
                 form.logText(globalWatch.ElapsedMilliseconds + "\tLen: " + len + "\t" + srcIp + ":" + srcPort + "\t->\t" +
-                    dstIp + ":" + dstPort + "\t seq: " + tcpPacket.SequenceNumber + "\t ack: " + tcpPacket.AcknowledgmentNumber + "\tSYN: " + tcpPacket.Syn + "\tACK: " + tcpPacket.Ack + "\t delay:" + delay);
+                    dstIp + ":" + dstPort + "\t seq: " + tcpPacket.SequenceNumber +"\t(" + rel[0] + ")\t ack: " + tcpPacket.AcknowledgmentNumber + "\t(" +rel[1] +
+                    ")\tSYN: " + tcpPacket.Syn + "\tACK: " + tcpPacket.Ack + "\t delay:" + delay);
                 //" \n" packet.PrintHex()
             }
         }

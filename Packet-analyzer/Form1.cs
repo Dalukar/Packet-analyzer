@@ -55,12 +55,13 @@ namespace Packet_analyzer
             else chTxt();
         }
 
-        public void LogBps(long bps)
+        public void LogBps(long bpsIn, long bpsOut)
         {
             // может убраать в анализатор?
             Action chTxt = new Action(() =>
             {
-                textBps.Text = Convert.ToString(bps);
+                textBpsOut.Text = Convert.ToString(bpsOut);
+                textBpsIn.Text = Convert.ToString(bpsIn);
             });
             if (InvokeRequired)
                 this.BeginInvoke(chTxt);

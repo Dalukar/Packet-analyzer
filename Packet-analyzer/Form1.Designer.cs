@@ -35,8 +35,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textHost = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBps = new System.Windows.Forms.TextBox();
+            this.textBpsOut = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.textBpsIn = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // devicesList
@@ -104,30 +106,49 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Host IP:";
             // 
-            // textBps
+            // textBpsOut
             // 
-            this.textBps.Location = new System.Drawing.Point(635, 12);
-            this.textBps.Name = "textBps";
-            this.textBps.ReadOnly = true;
-            this.textBps.Size = new System.Drawing.Size(159, 20);
-            this.textBps.TabIndex = 7;
+            this.textBpsOut.Location = new System.Drawing.Point(653, 12);
+            this.textBpsOut.Name = "textBpsOut";
+            this.textBpsOut.ReadOnly = true;
+            this.textBpsOut.Size = new System.Drawing.Size(159, 20);
+            this.textBpsOut.TabIndex = 7;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(602, 15);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(27, 13);
+            this.label3.Size = new System.Drawing.Size(45, 13);
             this.label3.TabIndex = 8;
-            this.label3.Text = "bps:";
+            this.label3.Text = "bps out:";
+            // 
+            // textBpsIn
+            // 
+            this.textBpsIn.Location = new System.Drawing.Point(653, 39);
+            this.textBpsIn.Name = "textBpsIn";
+            this.textBpsIn.ReadOnly = true;
+            this.textBpsIn.Size = new System.Drawing.Size(159, 20);
+            this.textBpsIn.TabIndex = 9;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(609, 42);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(38, 13);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "bps in:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1225, 498);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.textBpsIn);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBps);
+            this.Controls.Add(this.textBpsOut);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textHost);
             this.Controls.Add(this.label1);
@@ -152,8 +173,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textHost;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBps;
+        private System.Windows.Forms.TextBox textBpsOut;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBpsIn;
+        private System.Windows.Forms.Label label4;
     }
 }
 
