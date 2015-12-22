@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Packet_analyzer
 {
@@ -18,7 +19,7 @@ namespace Packet_analyzer
         uint seq2;
         List<PacketDotNet.TcpPacket> packetsIn = new List<PacketDotNet.TcpPacket>();
         List<PacketDotNet.TcpPacket> packetsOut = new List<PacketDotNet.TcpPacket>();
-
+        public Stopwatch delay = new Stopwatch();
         public TcpConnectionDump(string ip1, int port1, string ip2, int port2, uint seq1Start, uint seq2Start)
         {
             this.ip1 = ip1;
@@ -27,10 +28,12 @@ namespace Packet_analyzer
             this.port2 = port2;
             this.seq1Start = seq1Start;
             this.seq2Start = seq2Start;
+            delay.Restart();
         }
 
         public uint[] AddPacket(PacketDotNet.TcpPacket packet, string srcIp)
         {
+            delay.Restart();
             uint[] rel = new uint[2];
             if (seq2Start == 0)
                 seq2Start = packet.SequenceNumber;

@@ -21,7 +21,6 @@ namespace Packet_analyzer
         System.Net.IPAddress remoteIP;
 
         Stopwatch globalWatch = new Stopwatch();
-        Stopwatch stopWatch = new Stopwatch();
         uint prevSeq = 0;
         long delay = 0;
         long bpsIn = 0;
@@ -82,7 +81,6 @@ namespace Packet_analyzer
                     }
                 });
             bpsThread.Start();
-            stopWatch.Start();
             globalWatch.Start();
             captureThread.Start();
         }
@@ -105,7 +103,6 @@ namespace Packet_analyzer
                 if (dstIp.ToString() == remoteIP.ToString())
                 {
                     prevSeq = tcpPacket.AcknowledgmentNumber;
-                    stopWatch.Restart();
                     bpsOut += len;
 
                 }
@@ -114,11 +111,6 @@ namespace Packet_analyzer
                     bpsIn += len;
                 }
 
-                if (srcIp.ToString() == remoteIP.ToString() && tcpPacket.SequenceNumber == prevSeq)
-                {
-                    delay = stopWatch.ElapsedMilliseconds;
-                    //stopWatch.Restart();
-                }
 
                 int srcPort = tcpPacket.SourcePort;
                 int dstPort = tcpPacket.DestinationPort;
@@ -128,6 +120,7 @@ namespace Packet_analyzer
                 {
                     if (dump.isEqual(srcIp.ToString(), srcPort, dstIp.ToString(), dstPort))
                     {
+                        delay = dump.delay.ElapsedMilliseconds;
                         rel = dump.AddPacket(tcpPacket, srcIp.ToString());
                         isSessionExist = true;
                         break;
