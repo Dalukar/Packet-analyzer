@@ -21,7 +21,6 @@ namespace Packet_analyzer
         System.Net.IPAddress remoteIP;
 
         Stopwatch globalWatch = new Stopwatch();
-        uint prevSeq = 0;
         long delay = 0;
         long bpsIn = 0;
         long bpsOut = 0;
@@ -48,7 +47,7 @@ namespace Packet_analyzer
 
         public void StartCapture(int deviceNo)
         {
-            var device = devices[deviceNo] as SharpPcap.WinPcap.WinPcapDevice;
+            var device = devices[deviceNo];
 
             device.OnPacketArrival -=
                 new PacketArrivalEventHandler(device_OnPacketArrival); //надеюсь это работает
@@ -102,7 +101,6 @@ namespace Packet_analyzer
                 delay = -1;
                 if (dstIp.ToString() == remoteIP.ToString())
                 {
-                    prevSeq = tcpPacket.AcknowledgmentNumber;
                     bpsOut += len;
 
                 }
