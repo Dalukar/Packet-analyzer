@@ -72,6 +72,7 @@ namespace Packet_analyzer
 
             if (captureThread != null){captureThread.Abort();}
             if (bpsThread != null){bpsThread.Abort();}
+            if (autoStopThread != null) { autoStopThread.Abort(); }
             captureThread = new Thread(() => device.Capture());
             bpsThread = new Thread(() => 
                 { 
