@@ -15,8 +15,8 @@ namespace Packet_analyzer
         int port2;
         uint seq1Start;
         uint seq2Start;
-        uint seq1;
-        uint seq2;
+        //uint seq1;
+        //uint seq2;
         List<PacketDotNet.TcpPacket> packetsIn = new List<PacketDotNet.TcpPacket>();
         List<PacketDotNet.TcpPacket> packetsOut = new List<PacketDotNet.TcpPacket>();
         public Stopwatch delay = new Stopwatch();
