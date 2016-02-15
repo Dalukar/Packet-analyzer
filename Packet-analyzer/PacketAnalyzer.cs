@@ -12,7 +12,7 @@ namespace Packet_analyzer
 {
     class PacketAnalyzer
     {
-        private readonly PacketAnalyzerFormInterface form;
+        private readonly Form1 form;
         Thread captureThread;
         Thread bpsThread;
         Thread autoStopThread;
@@ -22,23 +22,43 @@ namespace Packet_analyzer
         System.Net.IPAddress remoteIP;
 
         Stopwatch SessionWatch = new Stopwatch();
-        long delay = 0;
-        long bpsIn = 0;
-        long bpsOut = 0;
-        int bytesIn = 0;
-        int bytesOut = 0;
-        double initDelay = 0;
+        double delay = 0;
+        double bytesIn = 0;
+        double bytesOut = 0;
+        public int calculateIntervals = 10;
+        public int proxyDelay = 0;
+        public double initDelay = 0;
+
+        public double uplinkV1;
+        public double downlinkV1;
+        public double avgDelayV1;
+        public double MOSV1;
+        public int V1TimeIteration = 1;
+        public int V1PacketsIteration = 1;
+
+        public double uplinkV2;
+        public double downlinkV2;
+        public double avgDelayV2;
+        public double MOSV2;
+        double[] uplinkV2Array;
+        double[] downlinkV2Array;
+        double[] delayV2Array;
+        int V2ArrayPosition = 0;
+        
+
+
         double lastPacketTime = 0;
-        public PacketAnalyzer(PacketAnalyzerFormInterface form)
+        public string logBuffer;
+        public PacketAnalyzer()
         {
-            this.form = form;
+            this.form = Program.form;
             string ver = SharpPcap.Version.VersionString;
-            form.logText("SharpPcap " + ver);
-            form.logText("");
+            logText("SharpPcap " + ver);
+            logText("");
             devices = CaptureDeviceList.Instance;
             if (devices.Count < 1)
             {
-                form.logText("No device found on this machine");
+                logText("No device found on this machine");
                 return;
             }
             devNames = new String[devices.Count];
@@ -51,6 +71,21 @@ namespace Packet_analyzer
 
         public void StartCapture(int deviceNo)
         {
+
+            uplinkV1 = 0;
+            downlinkV1 = 0;
+            avgDelayV1 = 0;
+            V1TimeIteration = 1;
+            V1PacketsIteration = 1;
+
+            uplinkV2 = 0;
+            downlinkV2 = 0;
+            avgDelayV2 = 0;
+            uplinkV2Array = new double[calculateIntervals];
+            downlinkV2Array = new double[calculateIntervals]; ;
+            delayV2Array = new double[calculateIntervals]; 
+
+
             var device = devices[deviceNo];
 
             device.OnPacketArrival -=
@@ -65,9 +100,9 @@ namespace Packet_analyzer
             device.Filter = filter;
             remoteIP = System.Net.IPAddress.Parse(form.hostText);
 
-            form.logText
+            logText
                 ("-- The following tcpdump filter will be applied: \"" + filter + "\"");
-            form.logText
+            logText
                 ("-- Listening on " + device.Description);
 
             if (captureThread != null){captureThread.Abort();}
@@ -78,9 +113,34 @@ namespace Packet_analyzer
                 { 
                     while (true) 
                     {
-                        form.LogBps(bpsIn, bpsOut); 
-                        bpsIn = 0;
-                        bpsOut = 0;
+                        downlinkV1 = (downlinkV1 * V1TimeIteration + bytesIn) / (V1TimeIteration + 1);
+                        uplinkV1 = (uplinkV1 * V1TimeIteration + bytesOut) / (V1TimeIteration + 1);
+                        V1TimeIteration += 1;
+
+                        uplinkV2Array[V2ArrayPosition] = bytesOut;
+                        downlinkV2Array[V2ArrayPosition] = bytesIn;
+
+                        V2ArrayPosition += 1;
+                        V2ArrayPosition = V2ArrayPosition % calculateIntervals;
+                        uplinkV2 = 0;
+                        downlinkV2 = 0;
+                        avgDelayV2 = 0;
+
+                        for (int i = 0; i<calculateIntervals; i++)
+                        {
+                            uplinkV2 += uplinkV2Array[i];
+                            downlinkV2 += downlinkV2Array[i];
+                            avgDelayV2 += delayV2Array[i];
+                        }
+
+                        uplinkV2 = uplinkV2 / calculateIntervals;
+                        downlinkV2 = downlinkV2 / calculateIntervals;
+                        avgDelayV2 = avgDelayV2 / calculateIntervals;
+                       
+                        MOSV1 = CalculateMOS(downlinkV1 / 1024, initDelay / 1000);
+                        MOSV2 = CalculateMOS(downlinkV2 / 1024, initDelay / 1000);
+                        bytesIn = 0;
+                        bytesOut = 0;
                         Thread.Sleep(1000); 
                     }
                 });
@@ -88,16 +148,15 @@ namespace Packet_analyzer
             {
                 while (true)
                 {
-                    if (SessionWatch.ElapsedMilliseconds - lastPacketTime >=3000)
+                    if (SessionWatch.ElapsedMilliseconds - lastPacketTime >=10000)
                     {
-                        form.logText("No packets recieved in 3 sec, closing capture");
+                        logText("No packets recieved in 10 sec, closing capture");
                         StopCapture();
                     }
                     Thread.Sleep(3000);
                 }
             });
             autoStopThread.Start();
-            bpsThread.Start();
             captureThread.Start();
         }
 
@@ -107,6 +166,10 @@ namespace Packet_analyzer
             if(!SessionWatch.IsRunning)
             {
                 SessionWatch.Start();
+            }
+            if (!bpsThread.IsAlive)
+            {
+                bpsThread.Start();
             }
             var len = e.Packet.Data.Length;
 
@@ -122,7 +185,6 @@ namespace Packet_analyzer
                 lastPacketTime = SessionWatch.ElapsedMilliseconds;
                 if (dstIp.ToString() == remoteIP.ToString())
                 {
-                    bpsOut += len;
                     bytesOut += len;
 
                 }
@@ -133,7 +195,6 @@ namespace Packet_analyzer
                     {
                         initDelay = SessionWatch.ElapsedMilliseconds;
                     }
-                    bpsIn += len;
                     bytesIn += len;
                 }
 
@@ -147,6 +208,15 @@ namespace Packet_analyzer
                     if (dump.isEqual(srcIp.ToString(), srcPort, dstIp.ToString(), dstPort))
                     {
                         delay = dump.delay.ElapsedMilliseconds;
+                        if (dstIp.ToString() != remoteIP.ToString())
+                        {
+                            avgDelayV1 = (avgDelayV1 * V1PacketsIteration + delay) / (V1PacketsIteration + 1);
+                            V1PacketsIteration += 1;
+
+                            delayV2Array[V2ArrayPosition] = delay;
+                            V2ArrayPosition += 1;
+                            V2ArrayPosition = V2ArrayPosition % calculateIntervals;
+                        }
                         rel = dump.AddPacket(tcpPacket, srcIp.ToString());
                         isSessionExist = true;
                         break;
@@ -158,21 +228,21 @@ namespace Packet_analyzer
                     sessions.Add(new TcpConnectionDump(srcIp.ToString(), srcPort, dstIp.ToString(), dstPort, tcpPacket.SequenceNumber, tcpPacket.AcknowledgmentNumber));
                 }
                 
-                form.logText(SessionWatch.ElapsedMilliseconds + "\tLen: " + len + "\t" + srcIp + ":" + srcPort + "\t->\t" +
+                logText(SessionWatch.ElapsedMilliseconds + "\tLen: " + len + "\t" + srcIp + ":" + srcPort + "\t->\t" +
                     dstIp + ":" + dstPort + "\t seq: " + tcpPacket.SequenceNumber +"\t(" + rel[0] + ")\t ack: " + tcpPacket.AcknowledgmentNumber + "\t(" +rel[1] +
-                    ")\tSYN: " + tcpPacket.Syn + "\tACK: " + tcpPacket.Ack + "\t delay:" + delay);
+                    ")\tSYN: " + tcpPacket.Syn + "\tACK: " + tcpPacket.Ack + "\t delay:" + delay/1000);
                 //" \n" packet.PrintHex()
             }
         }
 
         public void StopCapture()
         {
-            double brIn = (double)bytesIn / lastPacketTime * 1000;
-            double brOut = (double)bytesOut / lastPacketTime * 1000;
-            form.logText("-- capture stopped");
-            form.logText("Average speed (byte/second):\tin: " + brIn + "\tout: " + brOut);
-            form.logText("Initial delay (msec):\t" + initDelay);
-            form.logText("MOS:\t" + CalculateMOS(brIn / 1024, initDelay / 1000));
+            //double brIn = (double)bytesIn / lastPacketTime * 1000;
+            //double brOut = (double)bytesOut / lastPacketTime * 1000;
+            logText("-- capture stopped");
+            //logText("Average speed (byte/second):\tin: " + brIn + "\tout: " + brOut);
+            //logText("Initial delay (msec):\t" + initDelay);
+            //logText("MOS:\t" + CalculateMOS(brIn / 1024, initDelay / 1000));
             SessionWatch.Reset();
             initDelay = 0;
             bytesIn = 0;
@@ -203,6 +273,17 @@ namespace Packet_analyzer
             double c3 = -0.02;
             double MOS = (b-a)/(1 + c0 * Math.Pow(BR, -c1-c3*D)*Math.Pow(c2,D)) + a;
             return MOS;
+        }
+
+        void logText(string text)
+        {
+            logBuffer += text + "\n";
+        }
+        public string GetLog()
+        {
+            string ret = logBuffer;
+            logBuffer = "";
+            return ret;
         }
     }
 }

@@ -35,9 +35,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textHost = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBpsOut = new System.Windows.Forms.TextBox();
+            this.statusBox = new System.Windows.Forms.RichTextBox();
+            this.textCalcInterval = new System.Windows.Forms.TextBox();
+            this.textProxyDelay = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBpsIn = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -53,18 +54,18 @@
             // 
             this.logBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.logBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.logBox.Location = new System.Drawing.Point(12, 65);
+            this.logBox.Location = new System.Drawing.Point(12, 193);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(1208, 421);
+            this.logBox.Size = new System.Drawing.Size(1208, 404);
             this.logBox.TabIndex = 1;
             this.logBox.Text = "";
             // 
             // buttonStart
             // 
-            this.buttonStart.Location = new System.Drawing.Point(906, 3);
+            this.buttonStart.Location = new System.Drawing.Point(12, 159);
             this.buttonStart.Name = "buttonStart";
-            this.buttonStart.Size = new System.Drawing.Size(164, 36);
+            this.buttonStart.Size = new System.Drawing.Size(164, 28);
             this.buttonStart.TabIndex = 2;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
@@ -72,9 +73,9 @@
             // 
             // buttonStop
             // 
-            this.buttonStop.Location = new System.Drawing.Point(1076, 3);
+            this.buttonStop.Location = new System.Drawing.Point(432, 159);
             this.buttonStop.Name = "buttonStop";
-            this.buttonStop.Size = new System.Drawing.Size(144, 36);
+            this.buttonStop.Size = new System.Drawing.Size(164, 28);
             this.buttonStop.TabIndex = 3;
             this.buttonStop.Text = "Stop";
             this.buttonStop.UseVisualStyleBackColor = true;
@@ -106,49 +107,62 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Host IP:";
             // 
-            // textBpsOut
+            // statusBox
             // 
-            this.textBpsOut.Location = new System.Drawing.Point(653, 12);
-            this.textBpsOut.Name = "textBpsOut";
-            this.textBpsOut.ReadOnly = true;
-            this.textBpsOut.Size = new System.Drawing.Size(159, 20);
-            this.textBpsOut.TabIndex = 7;
+            this.statusBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.statusBox.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.statusBox.Location = new System.Drawing.Point(602, 3);
+            this.statusBox.Name = "statusBox";
+            this.statusBox.ReadOnly = true;
+            this.statusBox.Size = new System.Drawing.Size(618, 184);
+            this.statusBox.TabIndex = 7;
+            this.statusBox.Text = "";
+            // 
+            // textCalcInterval
+            // 
+            this.textCalcInterval.Location = new System.Drawing.Point(286, 65);
+            this.textCalcInterval.Name = "textCalcInterval";
+            this.textCalcInterval.Size = new System.Drawing.Size(38, 20);
+            this.textCalcInterval.TabIndex = 8;
+            this.textCalcInterval.Text = "10";
+            // 
+            // textProxyDelay
+            // 
+            this.textProxyDelay.Location = new System.Drawing.Point(86, 65);
+            this.textProxyDelay.Name = "textProxyDelay";
+            this.textProxyDelay.Size = new System.Drawing.Size(60, 20);
+            this.textProxyDelay.TabIndex = 9;
+            this.textProxyDelay.Text = "0";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(602, 15);
+            this.label3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label3.Location = new System.Drawing.Point(168, 68);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(45, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "bps out:";
-            // 
-            // textBpsIn
-            // 
-            this.textBpsIn.Location = new System.Drawing.Point(653, 39);
-            this.textBpsIn.Name = "textBpsIn";
-            this.textBpsIn.ReadOnly = true;
-            this.textBpsIn.Size = new System.Drawing.Size(159, 20);
-            this.textBpsIn.TabIndex = 9;
+            this.label3.Size = new System.Drawing.Size(112, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "V2 calculate Intervals:";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(609, 42);
+            this.label4.Location = new System.Drawing.Point(14, 68);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 13);
-            this.label4.TabIndex = 10;
-            this.label4.Text = "bps in:";
+            this.label4.Size = new System.Drawing.Size(66, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "Proxy Delay:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1225, 498);
+            this.ClientSize = new System.Drawing.Size(1225, 609);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBpsIn);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBpsOut);
+            this.Controls.Add(this.textProxyDelay);
+            this.Controls.Add(this.textCalcInterval);
+            this.Controls.Add(this.statusBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textHost);
             this.Controls.Add(this.label1);
@@ -173,9 +187,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textHost;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBpsOut;
+        private System.Windows.Forms.RichTextBox statusBox;
+        private System.Windows.Forms.TextBox textCalcInterval;
+        private System.Windows.Forms.TextBox textProxyDelay;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBpsIn;
         private System.Windows.Forms.Label label4;
     }
 }

@@ -11,9 +11,8 @@ using System.Threading;
 
 namespace Packet_analyzer
 {
-    public partial class Form1 : Form, PacketAnalyzerFormInterface
+    public partial class Form1 : Form
     {
-        public string logBuffer;
         Thread logUpdateThread;
         public string hostText
         {
@@ -36,19 +35,23 @@ namespace Packet_analyzer
 
         private void buttonStart_Click(object sender, EventArgs e)
         {
+            Program.Analyzer.calculateIntervals = Convert.ToInt32(textCalcInterval.Text);
+            Program.Analyzer.proxyDelay = Convert.ToInt32(textProxyDelay.Text);
             Program.Analyzer.StartCapture(devicesList.SelectedIndex);
             if (logUpdateThread != null) { logUpdateThread.Abort(); }
             logUpdateThread = new Thread(() =>
             {
                 while (true)
                 {
-                    if(logBuffer != "")
+                    UpdateStatusBox();
+                    string log = Program.Analyzer.GetLog();
+                    if(log != "")
                     {
                         Action chTxt = new Action(() =>
                         {
-                            logBox.AppendText(logBuffer);
+                            logBox.AppendText(log);
                             logBox.ScrollToCaret();
-                            logBuffer = "";
+                            log = "";
                         });
                         if (InvokeRequired)
                             this.BeginInvoke(chTxt);
@@ -70,21 +73,30 @@ namespace Packet_analyzer
             devicesList.DataSource = devices;
         }
 
-        public void logText(string text)
+        void UpdateStatusBox()
         {
-            logBuffer += text +"\n";
-        }
 
-        public void LogBps(long bpsIn, long bpsOut)
-        {
             Action chTxt = new Action(() =>
             {
-                textBpsOut.Text = Convert.ToString(bpsOut);
-                textBpsIn.Text = Convert.ToString(bpsIn);
+                string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
+                "------V1------ \n" +
+                "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
+                "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
+                "Delay: " + Program.Analyzer.avgDelayV1/1000 + "\n" +
+                "MOS: " + Program.Analyzer.MOSV1 + "\n" +
+                "------V2------ \n" +
+                "Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
+                "Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
+                "Delay: " + Program.Analyzer.avgDelayV2/1000 + "\n" +
+                "MOS: " + Program.Analyzer.MOSV2 + "\n";
+                statusBox.Text = status;
             });
             if (InvokeRequired)
                 this.BeginInvoke(chTxt);
             else chTxt();
+
+
+
         }
     }
 }
