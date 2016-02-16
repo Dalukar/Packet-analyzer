@@ -137,8 +137,8 @@ namespace Packet_analyzer
                         downlinkV2 = downlinkV2 / calculateIntervals;
                         avgDelayV2 = avgDelayV2 / calculateIntervals;
                        
-                        MOSV1 = CalculateMOS(downlinkV1 / 1024, initDelay / 1000);
-                        MOSV2 = CalculateMOS(downlinkV2 / 1024, initDelay / 1000);
+                        MOSV1 = CalculateMOS(downlinkV1 / 1024, (initDelay + proxyDelay) / 1000);
+                        MOSV2 = CalculateMOS(downlinkV2 / 1024, (initDelay + proxyDelay)/ 1000);
                         bytesIn = 0;
                         bytesOut = 0;
                         Thread.Sleep(1000); 
