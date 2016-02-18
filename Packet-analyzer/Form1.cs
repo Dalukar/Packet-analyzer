@@ -14,6 +14,7 @@ namespace Packet_analyzer
     public partial class Form1 : Form
     {
         Thread logUpdateThread;
+        Thread statusUpdateThread;
         public string hostText
         {
             get { return textHost.Text; }
@@ -31,6 +32,10 @@ namespace Packet_analyzer
             {
                 logUpdateThread.Abort();
             }
+            if (statusUpdateThread != null)
+            {
+                statusUpdateThread.Abort();
+            }
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -43,7 +48,6 @@ namespace Packet_analyzer
             {
                 while (true)
                 {
-                    UpdateStatusBox();
                     string log = Program.Analyzer.GetLog();
                     if(log != "")
                     {
@@ -60,7 +64,9 @@ namespace Packet_analyzer
                     Thread.Sleep(1000);
                 }
             });
+            statusUpdateThread = new Thread(new ThreadStart(UpdateStatusBox));
             logUpdateThread.Start();
+            statusUpdateThread.Start();
         }
 
         private void buttonStop_Click(object sender, EventArgs e)
@@ -75,28 +81,28 @@ namespace Packet_analyzer
 
         void UpdateStatusBox()
         {
-
-            Action chTxt = new Action(() =>
+            while(true)
             {
-                string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
-                "------V1------ \n" +
-                "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
-                "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
-                "Delay: " + Program.Analyzer.avgDelayV1/1000 + "\n" +
-                "MOS: " + Program.Analyzer.MOSV1 + "\n" +
-                "------V2------ \n" +
-                "Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
-                "Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
-                "Delay: " + Program.Analyzer.avgDelayV2/1000 + "\n" +
-                "MOS: " + Program.Analyzer.MOSV2 + "\n";
-                statusBox.Text = status;
-            });
-            if (InvokeRequired)
-                this.BeginInvoke(chTxt);
-            else chTxt();
-
-
-
+                Action chTxt = new Action(() =>
+                {
+                    string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
+                    "------V1------ \n" +
+                    "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
+                    "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
+                    "Delay: " + (Program.Analyzer.avgDelayV1 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
+                    "MOS: " + Program.Analyzer.MOSV1 + "\n" +
+                    "------V2------ \n" +
+                    "Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
+                    "Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
+                    "Delay: " +( Program.Analyzer.avgDelayV2 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
+                    "MOS: " + Program.Analyzer.MOSV2 + "\n";
+                    statusBox.Text = status;
+                });
+                if (InvokeRequired)
+                    this.BeginInvoke(chTxt);
+                else chTxt();
+                Thread.Sleep(10000);
+            }
         }
     }
 }
