@@ -22,6 +22,9 @@ namespace Packet_analyzer
         System.Net.IPAddress remoteIP;
 
         Stopwatch SessionWatch = new Stopwatch();
+        public double DLThreshold = 0;
+        public List<bool> DLThresholdArray = new List<bool>();
+        public List<double> DLArray = new List<double>();
         double delay = 0;
         double bytesIn = 0;
         double bytesOut = 0;
@@ -138,7 +141,17 @@ namespace Packet_analyzer
                         avgDelayV2 = avgDelayV2 / calculateIntervals;
                        
                         MOSV1 = CalculateMOS(downlinkV1 / 1024, (initDelay + proxyDelay) / 1000);
+                       //MOSV1 = CalculateMOS(31.75, 1.402);
                         MOSV2 = CalculateMOS(downlinkV2 / 1024, (initDelay + proxyDelay)/ 1000);
+                        DLArray.Add(bytesIn);
+                        if (bytesIn < DLThreshold)
+                        {
+                            DLThresholdArray.Add(false);
+                        }
+                        else
+                        {
+                            DLThresholdArray.Add(true);
+                        }
                         bytesIn = 0;
                         bytesOut = 0;
                         Thread.Sleep(1000); 

@@ -40,6 +40,9 @@
             this.textProxyDelay = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textThreshold = new System.Windows.Forms.TextBox();
+            this.buttonGraph = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // devicesList
@@ -57,7 +60,7 @@
             this.logBox.Location = new System.Drawing.Point(12, 193);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(1208, 404);
+            this.logBox.Size = new System.Drawing.Size(1208, 402);
             this.logBox.TabIndex = 1;
             this.logBox.Text = "";
             // 
@@ -73,7 +76,7 @@
             // 
             // buttonStop
             // 
-            this.buttonStop.Location = new System.Drawing.Point(432, 159);
+            this.buttonStop.Location = new System.Drawing.Point(182, 159);
             this.buttonStop.Name = "buttonStop";
             this.buttonStop.Size = new System.Drawing.Size(164, 28);
             this.buttonStop.TabIndex = 3;
@@ -153,11 +156,41 @@
             this.label4.TabIndex = 11;
             this.label4.Text = "Proxy Delay:";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(14, 97);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(121, 13);
+            this.label5.TabIndex = 13;
+            this.label5.Text = "DL threshold (byte/sec):";
+            // 
+            // textThreshold
+            // 
+            this.textThreshold.Location = new System.Drawing.Point(141, 94);
+            this.textThreshold.Name = "textThreshold";
+            this.textThreshold.Size = new System.Drawing.Size(60, 20);
+            this.textThreshold.TabIndex = 12;
+            this.textThreshold.Text = "50000";
+            // 
+            // buttonGraph
+            // 
+            this.buttonGraph.Location = new System.Drawing.Point(432, 159);
+            this.buttonGraph.Name = "buttonGraph";
+            this.buttonGraph.Size = new System.Drawing.Size(164, 28);
+            this.buttonGraph.TabIndex = 16;
+            this.buttonGraph.Text = "Graph";
+            this.buttonGraph.UseVisualStyleBackColor = true;
+            this.buttonGraph.Click += new System.EventHandler(this.buttonGraph_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1225, 609);
+            this.ClientSize = new System.Drawing.Size(1225, 607);
+            this.Controls.Add(this.buttonGraph);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.textThreshold);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textProxyDelay);
@@ -192,6 +225,9 @@
         private System.Windows.Forms.TextBox textProxyDelay;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textThreshold;
+        private System.Windows.Forms.Button buttonGraph;
     }
 }
 

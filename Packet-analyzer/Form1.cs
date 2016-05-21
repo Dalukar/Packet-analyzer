@@ -15,6 +15,7 @@ namespace Packet_analyzer
     {
         Thread logUpdateThread;
         Thread statusUpdateThread;
+        Form GraphForm;
         public string hostText
         {
             get { return textHost.Text; }
@@ -27,6 +28,7 @@ namespace Packet_analyzer
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            GraphForm.Close();
             Program.Analyzer.StopCapture();
             if (logUpdateThread != null)
             {
@@ -41,6 +43,7 @@ namespace Packet_analyzer
         private void buttonStart_Click(object sender, EventArgs e)
         {
             Program.Analyzer.calculateIntervals = Convert.ToInt32(textCalcInterval.Text);
+            Program.Analyzer.DLThreshold = Convert.ToInt32(textThreshold.Text);
             Program.Analyzer.proxyDelay = Convert.ToInt32(textProxyDelay.Text);
             Program.Analyzer.StartCapture(devicesList.SelectedIndex);
             if (logUpdateThread != null) { logUpdateThread.Abort(); }
@@ -86,16 +89,16 @@ namespace Packet_analyzer
                 Action chTxt = new Action(() =>
                 {
                     string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
-                    "------V1------ \n" +
+                   // "------V1------ \n" +
                     "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
                     "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
                     "Delay: " + (Program.Analyzer.avgDelayV1 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
-                    "MOS: " + Program.Analyzer.MOSV1 + "\n" +
-                    "------V2------ \n" +
-                    "Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
-                    "Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
-                    "Delay: " +( Program.Analyzer.avgDelayV2 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
-                    "MOS: " + Program.Analyzer.MOSV2 + "\n";
+                    "MOS: " + Math.Round(Program.Analyzer.MOSV1, 1) + "\n"; //+
+                    //"------V2------ \n" +
+                    //"Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
+                    //"Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
+                    //"Delay: " +( Program.Analyzer.avgDelayV2 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
+                    //"MOS: " + Program.Analyzer.MOSV2 + "\n";
                     statusBox.Text = status;
                 });
                 if (InvokeRequired)
@@ -104,5 +107,16 @@ namespace Packet_analyzer
                 Thread.Sleep(10000);
             }
         }
+
+        private void buttonGraph_Click(object sender, EventArgs e)
+        {
+            if (GraphForm == null || !GraphForm.Visible)
+           {
+               GraphForm = new Graph();
+               GraphForm.Show();
+           }
+        }
+
+       
     }
 }
