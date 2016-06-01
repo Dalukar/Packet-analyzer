@@ -27,6 +27,7 @@ namespace Packet_analyzer
         public List<double> DLArray = new List<double>();
         double delay = 0;
         double bytesIn = 0;
+        double bytesInTotal = 0;
         double bytesOut = 0;
         public int calculateIntervals = 10;
         public int proxyDelay = 0;
@@ -47,11 +48,11 @@ namespace Packet_analyzer
         double[] downlinkV2Array;
         double[] delayV2Array;
         int V2ArrayPosition = 0;
-        
-
 
         double lastPacketTime = 0;
         public string logBuffer;
+
+        System.IO.StreamWriter log;
         public PacketAnalyzer()
         {
             this.form = Program.form;
@@ -74,6 +75,15 @@ namespace Packet_analyzer
 
         public void StartCapture(int deviceNo)
         {
+            StopCapture();
+            if (System.IO.File.Exists("log.txt"))
+            {
+                System.IO.File.WriteAllText("log.txt", string.Empty);
+            }
+
+
+            log = new System.IO.StreamWriter("log.txt");
+            log.WriteLine(String.Format("{0,-30}{1,-30}", "downlink", "delay"));
 
             uplinkV1 = 0;
             downlinkV1 = 0;
@@ -152,8 +162,10 @@ namespace Packet_analyzer
                         {
                             DLThresholdArray.Add(true);
                         }
+                        bytesInTotal += bytesIn;
                         bytesIn = 0;
                         bytesOut = 0;
+                        log.WriteLine(String.Format("{0,-30}{1,-30}",Math.Round(downlinkV1, 1), Math.Round(avgDelayV1 + proxyDelay, 0) / 1000));
                         Thread.Sleep(1000); 
                     }
                 });
@@ -253,6 +265,7 @@ namespace Packet_analyzer
             //double brIn = (double)bytesIn / lastPacketTime * 1000;
             //double brOut = (double)bytesOut / lastPacketTime * 1000;
             logText("-- capture stopped");
+            logText("Video MOS = " + Math.Round(CalculateVideoMOS(), 2));
             //logText("Average speed (byte/second):\tin: " + brIn + "\tout: " + brOut);
             //logText("Initial delay (msec):\t" + initDelay);
             //logText("MOS:\t" + CalculateMOS(brIn / 1024, initDelay / 1000));
@@ -272,6 +285,10 @@ namespace Packet_analyzer
             {
                 autoStopThread.Abort();
             }
+            if(log != null)
+            {
+                log.Close();
+            }
         }
 
         public double CalculateMOS(double BR, double D)
@@ -287,7 +304,70 @@ namespace Packet_analyzer
             double MOS = (b-a)/(1 + c0 * Math.Pow(BR, -c1-c3*D)*Math.Pow(c2,D)) + a;
             return MOS;
         }
+        public double CalculateVideoMOS()
+        {
+            double MOS;
+            double alpha = 0.66;
+            double beta = 0.77;
+            int sView = 5;
+            int sInteraction = 5;
+            double sQuality = 5;
 
+            //считаем sView
+            if(DLThresholdArray.Count > 20)
+            {
+                int bufferingIntervals = 0;
+                int totalIntervals = (DLThresholdArray.Count-10)/10;
+                for(int i = 1; i <= totalIntervals; i++)
+                {
+                    int b = 0;
+                    for(int j = 0; j < 10; j++)
+                    {
+                        if(!DLThresholdArray[i + j])
+                            b++;
+                    }
+                    if(b > 5)
+                        bufferingIntervals++;
+                }
+                double sStalling = bufferingIntervals/totalIntervals * 100;
+                sStalling = 20;
+                sView = 5;
+                if (sStalling >= 5 ) sView = 4;
+                if (sStalling >= 10) sView = 3;
+                if (sStalling >= 15) sView = 2;
+                if (sStalling >= 30) sView = 1;
+            }
+
+            //считаем sQuality
+            double avgDownlink = bytesInTotal / SessionWatch.ElapsedMilliseconds * 1000;
+            sQuality = 3;
+            if (avgDownlink >= 312500) sQuality = 3.64;
+            if (avgDownlink >= 625000) sQuality = 4;
+            if (avgDownlink >= 1000000) sQuality = 4.45;
+            if (avgDownlink >= 2000000) sQuality = 4.58;
+            if (avgDownlink >= 5000000) sQuality = 4.78;
+            if (avgDownlink >= 6000000) sQuality = 5;
+
+            //считаем sInteraction
+            if (DLThresholdArray.Count > 10)
+            {
+                int bufferingSec = 0;
+                for (int i = 0; i < 10; i++)
+                {
+                    if (DLThresholdArray[i])
+                        break;
+                    else
+                        bufferingSec++;
+                }
+                sInteraction = 5;
+                if (bufferingSec >= 1) sInteraction = 3;
+                if (bufferingSec >= 2) sInteraction = 2;
+                if (bufferingSec >= 4) sInteraction = 1;
+            }
+
+            MOS = (sQuality - 1) * ((alpha * (sInteraction - 1) + beta * (sView - 1)) / (4 *(alpha + beta))) + 1;
+            return MOS;
+        }
         void logText(string text)
         {
             logBuffer += text + "\n";

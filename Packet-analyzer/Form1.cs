@@ -28,7 +28,10 @@ namespace Packet_analyzer
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GraphForm.Close();
+            if(GraphForm != null)
+            {
+                GraphForm.Close();
+            }
             Program.Analyzer.StopCapture();
             if (logUpdateThread != null)
             {
@@ -67,6 +70,10 @@ namespace Packet_analyzer
                     Thread.Sleep(1000);
                 }
             });
+            if (statusUpdateThread != null)
+            {
+                statusUpdateThread.Abort();
+            }
             statusUpdateThread = new Thread(new ThreadStart(UpdateStatusBox));
             logUpdateThread.Start();
             statusUpdateThread.Start();
