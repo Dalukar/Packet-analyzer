@@ -149,7 +149,17 @@ namespace Packet_analyzer
                         uplinkV2 = uplinkV2 / calculateIntervals;
                         downlinkV2 = downlinkV2 / calculateIntervals;
                         avgDelayV2 = avgDelayV2 / calculateIntervals;
-                       
+
+                        // ---меняем местами---
+                        var tmp = uplinkV2;
+                        uplinkV2 = downlinkV2;
+                        downlinkV2 = tmp;
+
+                        tmp = uplinkV1;
+                        uplinkV1 = downlinkV1;
+                        downlinkV1 = tmp;
+                        // ---------------------
+
                         MOSV1 = CalculateMOS(downlinkV1 / 1024, (initDelay + proxyDelay) / 1000);
                        //MOSV1 = CalculateMOS(31.75, 1.402);
                         MOSV2 = CalculateMOS(downlinkV2 / 1024, (initDelay + proxyDelay)/ 1000);
@@ -314,6 +324,7 @@ namespace Packet_analyzer
             double sQuality = 5;
 
             //считаем sView
+            double sStalling = 0;
             if(DLThresholdArray.Count > 20)
             {
                 int bufferingIntervals = 0;
@@ -329,14 +340,14 @@ namespace Packet_analyzer
                     if(b > 5)
                         bufferingIntervals++;
                 }
-                double sStalling = bufferingIntervals/totalIntervals * 100;
-                sStalling = 20;
+                sStalling = bufferingIntervals/totalIntervals * 100;
                 sView = 5;
                 if (sStalling >= 5 ) sView = 4;
                 if (sStalling >= 10) sView = 3;
                 if (sStalling >= 15) sView = 2;
                 if (sStalling >= 30) sView = 1;
             }
+            logText(String.Format("{0,-20} {1,-30}", "sView = " + sView, "sStalling = " + sStalling));
 
             //считаем sQuality
             double avgDownlink = bytesInTotal / SessionWatch.ElapsedMilliseconds * 1000;
@@ -347,11 +358,12 @@ namespace Packet_analyzer
             if (avgDownlink >= 2000000) sQuality = 4.58;
             if (avgDownlink >= 5000000) sQuality = 4.78;
             if (avgDownlink >= 6000000) sQuality = 5;
+            logText(String.Format("{0,-20} {1,-30}", "sQuality = " + sQuality, "avgDownlink = " + Math.Round(avgDownlink, 1)));
 
             //считаем sInteraction
+            int bufferingSec = 0;
             if (DLThresholdArray.Count > 10)
             {
-                int bufferingSec = 0;
                 for (int i = 0; i < 10; i++)
                 {
                     if (DLThresholdArray[i])
@@ -364,6 +376,7 @@ namespace Packet_analyzer
                 if (bufferingSec >= 2) sInteraction = 2;
                 if (bufferingSec >= 4) sInteraction = 1;
             }
+            logText(String.Format("{0,-20} {1,-30}", "sInteraction = " + sInteraction, "bufferingSec = " + bufferingSec));
 
             MOS = (sQuality - 1) * ((alpha * (sInteraction - 1) + beta * (sView - 1)) / (4 *(alpha + beta))) + 1;
             return MOS;
