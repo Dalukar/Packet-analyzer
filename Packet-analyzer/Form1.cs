@@ -87,6 +87,10 @@ namespace Packet_analyzer
         private void buttonStop_Click(object sender, EventArgs e)
         {            
             Program.Analyzer.StopCapture();
+            if (statusUpdateThread != null)
+            {
+                statusUpdateThread.Abort();
+            }
             if (checkBox1.Checked)
             {
                 Program.Analyzer.CalculateVideoMOS();
