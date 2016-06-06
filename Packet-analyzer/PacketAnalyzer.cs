@@ -52,6 +52,11 @@ namespace Packet_analyzer
         double lastPacketTime = 0;
         public string logBuffer;
 
+        public int sView = 5;
+        public int sInteraction = 5;
+        public double sQuality = 5;
+        public double VideoMOS = 5;
+
         System.IO.StreamWriter log;
         public PacketAnalyzer()
         {
@@ -275,7 +280,6 @@ namespace Packet_analyzer
             //double brIn = (double)bytesIn / lastPacketTime * 1000;
             //double brOut = (double)bytesOut / lastPacketTime * 1000;
             logText("-- capture stopped");
-            logText("Video MOS = " + Math.Round(CalculateVideoMOS(), 2));
             //logText("Average speed (byte/second):\tin: " + brIn + "\tout: " + brOut);
             //logText("Initial delay (msec):\t" + initDelay);
             //logText("MOS:\t" + CalculateMOS(brIn / 1024, initDelay / 1000));
@@ -316,12 +320,8 @@ namespace Packet_analyzer
         }
         public double CalculateVideoMOS()
         {
-            double MOS;
             double alpha = 0.66;
             double beta = 0.77;
-            int sView = 5;
-            int sInteraction = 5;
-            double sQuality = 5;
 
             //считаем sView
             double sStalling = 0;
@@ -347,7 +347,6 @@ namespace Packet_analyzer
                 if (sStalling >= 15) sView = 2;
                 if (sStalling >= 30) sView = 1;
             }
-            logText(String.Format("{0,-20} {1,-30}", "sView = " + sView, "sStalling = " + sStalling));
 
             //считаем sQuality
             double avgDownlink = bytesInTotal / SessionWatch.ElapsedMilliseconds * 1000;
@@ -358,7 +357,6 @@ namespace Packet_analyzer
             if (avgDownlink >= 2000000) sQuality = 4.58;
             if (avgDownlink >= 5000000) sQuality = 4.78;
             if (avgDownlink >= 6000000) sQuality = 5;
-            logText(String.Format("{0,-20} {1,-30}", "sQuality = " + sQuality, "avgDownlink = " + Math.Round(avgDownlink, 1)));
 
             //считаем sInteraction
             int bufferingSec = 0;
@@ -376,10 +374,9 @@ namespace Packet_analyzer
                 if (bufferingSec >= 2) sInteraction = 2;
                 if (bufferingSec >= 4) sInteraction = 1;
             }
-            logText(String.Format("{0,-20} {1,-30}", "sInteraction = " + sInteraction, "bufferingSec = " + bufferingSec));
 
-            MOS = (sQuality - 1) * ((alpha * (sInteraction - 1) + beta * (sView - 1)) / (4 *(alpha + beta))) + 1;
-            return MOS;
+            VideoMOS = (sQuality - 1) * ((alpha * (sInteraction - 1) + beta * (sView - 1)) / (4 *(alpha + beta))) + 1;
+            return VideoMOS;
         }
         void logText(string text)
         {

@@ -70,18 +70,32 @@ namespace Packet_analyzer
                     Thread.Sleep(1000);
                 }
             });
-            if (statusUpdateThread != null)
+            if(!checkBox1.Checked)
             {
-                statusUpdateThread.Abort();
+                if (statusUpdateThread != null)
+                {
+                    statusUpdateThread.Abort();
+                }
+                statusUpdateThread = new Thread(new ThreadStart(UpdateStatusBox));
+
+                statusUpdateThread.Start();
             }
-            statusUpdateThread = new Thread(new ThreadStart(UpdateStatusBox));
+            
             logUpdateThread.Start();
-            statusUpdateThread.Start();
         }
 
         private void buttonStop_Click(object sender, EventArgs e)
-        {
+        {            
             Program.Analyzer.StopCapture();
+            if (checkBox1.Checked)
+            {
+                Program.Analyzer.CalculateVideoMOS();
+                string status = "sView:" + Program.Analyzer.sView + "\n" +
+                        "sQuality: " + Program.Analyzer.sQuality + "\n" +
+                        "sInteraction: " + Program.Analyzer.sInteraction + "\n" +
+                        "Video MOS: " + Math.Round(Program.Analyzer.VideoMOS, 1) + "\n";
+                statusBox.Text = status;
+            }
         }
 
         public void SetDevicesNames(string[] devices)

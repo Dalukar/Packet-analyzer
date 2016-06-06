@@ -43,6 +43,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.textThreshold = new System.Windows.Forms.TextBox();
             this.buttonGraph = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // devicesList
@@ -123,7 +124,7 @@
             // 
             // textCalcInterval
             // 
-            this.textCalcInterval.Location = new System.Drawing.Point(286, 65);
+            this.textCalcInterval.Location = new System.Drawing.Point(282, 65);
             this.textCalcInterval.Name = "textCalcInterval";
             this.textCalcInterval.Size = new System.Drawing.Size(38, 20);
             this.textCalcInterval.TabIndex = 8;
@@ -141,7 +142,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.label3.Location = new System.Drawing.Point(168, 68);
+            this.label3.Location = new System.Drawing.Point(164, 68);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(112, 13);
             this.label3.TabIndex = 10;
@@ -183,11 +184,22 @@
             this.buttonGraph.UseVisualStyleBackColor = true;
             this.buttonGraph.Click += new System.EventHandler(this.buttonGraph_Click);
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(15, 123);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(80, 17);
+            this.checkBox1.TabIndex = 17;
+            this.checkBox1.Text = "Video MOS";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1225, 607);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.buttonGraph);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textThreshold);
@@ -228,6 +240,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textThreshold;
         private System.Windows.Forms.Button buttonGraph;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
