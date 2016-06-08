@@ -52,6 +52,7 @@ namespace Packet_analyzer
         double lastPacketTime = 0;
         public string logBuffer;
 
+        double sessionTime = 0;
         public int sView = 5;
         public int sInteraction = 5;
         public double sQuality = 5;
@@ -283,6 +284,7 @@ namespace Packet_analyzer
             //logText("Average speed (byte/second):\tin: " + brIn + "\tout: " + brOut);
             //logText("Initial delay (msec):\t" + initDelay);
             //logText("MOS:\t" + CalculateMOS(brIn / 1024, initDelay / 1000));
+            sessionTime = SessionWatch.ElapsedMilliseconds;
             SessionWatch.Reset();
             initDelay = 0;
             bytesIn = 0;
@@ -349,7 +351,7 @@ namespace Packet_analyzer
             }
 
             //считаем sQuality
-            double avgDownlink = bytesInTotal / SessionWatch.ElapsedMilliseconds * 1000;
+            double avgDownlink = bytesInTotal / sessionTime * 1000;
             sQuality = 3;
             if (avgDownlink >= 312500) sQuality = 3.64;
             if (avgDownlink >= 625000) sQuality = 4;
