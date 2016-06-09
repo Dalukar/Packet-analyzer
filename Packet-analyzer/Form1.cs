@@ -70,8 +70,6 @@ namespace Packet_analyzer
                     Thread.Sleep(1000);
                 }
             });
-            if(!checkBox1.Checked)
-            {
                 if (statusUpdateThread != null)
                 {
                     statusUpdateThread.Abort();
@@ -79,18 +77,13 @@ namespace Packet_analyzer
                 statusUpdateThread = new Thread(new ThreadStart(UpdateStatusBox));
 
                 statusUpdateThread.Start();
-            }
             
             logUpdateThread.Start();
         }
 
         private void buttonStop_Click(object sender, EventArgs e)
-        {            
+        {
             Program.Analyzer.StopCapture();
-            if (statusUpdateThread != null)
-            {
-                statusUpdateThread.Abort();
-            }
             if (checkBox1.Checked)
             {
                 Program.Analyzer.CalculateVideoMOS();
@@ -100,6 +93,11 @@ namespace Packet_analyzer
                         "Video MOS: " + Math.Round(Program.Analyzer.VideoMOS, 1) + "\n";
                 statusBox.Text = status;
             }
+                
+                if (statusUpdateThread != null)
+                {
+                    statusUpdateThread.Abort();
+                }
         }
 
         public void SetDevicesNames(string[] devices)
@@ -113,18 +111,27 @@ namespace Packet_analyzer
             {
                 Action chTxt = new Action(() =>
                 {
-                    string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
-                   // "------V1------ \n" +
-                    "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
-                    "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
-                    "Delay: " + (Program.Analyzer.avgDelayV1 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
-                    "MOS: " + Math.Round(Program.Analyzer.MOSV1, 1) + "\n"; //+
-                    //"------V2------ \n" +
-                    //"Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
-                    //"Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
-                    //"Delay: " +( Program.Analyzer.avgDelayV2 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
-                    //"MOS: " + Program.Analyzer.MOSV2 + "\n";
-                    statusBox.Text = status;
+                    if (!checkBox1.Checked)
+                    {
+                        string status = "Initial delay:" + Program.Analyzer.initDelay + "\n" +
+                            // "------V1------ \n" +
+                        "Uplink: " + Program.Analyzer.uplinkV1 + "\n" +
+                        "Downlink: " + Program.Analyzer.downlinkV1 + "\n" +
+                        "Delay: " + (Program.Analyzer.avgDelayV1 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
+                        "MOS: " + Math.Round(Program.Analyzer.MOSV1, 1) + "\n"; //+
+                        //"------V2------ \n" +
+                        //"Uplink: " + Program.Analyzer.uplinkV2 + "\n" +
+                        //"Downlink: " + Program.Analyzer.downlinkV2 + "\n" +
+                        //"Delay: " +( Program.Analyzer.avgDelayV2 + Program.Analyzer.proxyDelay) / 1000 + "\n" +
+                        //"MOS: " + Program.Analyzer.MOSV2 + "\n";
+                        statusBox.Text = status;
+                    }
+                    else
+                    {
+                        string status = "Downlink:" + Program.Analyzer.videoMOSUplink + "\n"+
+                        "Stalling:" + Program.Analyzer.lastBufferingIntervals + "/6\n";
+                        statusBox.Text = status;
+                    }
                 });
                 if (InvokeRequired)
                     this.BeginInvoke(chTxt);

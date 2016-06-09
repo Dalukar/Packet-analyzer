@@ -52,6 +52,11 @@ namespace Packet_analyzer
         double lastPacketTime = 0;
         public string logBuffer;
 
+        double videoMOSUplinkBuffer = 0;
+        public double videoMOSUplink = 0;
+        double videoMOSUplinkCycle = 0;
+        double videoMOSStallingCycle = 0;
+        public int lastBufferingIntervals = 0;
         double sessionTime = 0;
         public int sView = 5;
         public int sInteraction = 5;
@@ -169,15 +174,41 @@ namespace Packet_analyzer
                         MOSV1 = CalculateMOS(downlinkV1 / 1024, (initDelay + proxyDelay) / 1000);
                        //MOSV1 = CalculateMOS(31.75, 1.402);
                         MOSV2 = CalculateMOS(downlinkV2 / 1024, (initDelay + proxyDelay)/ 1000);
-                        DLArray.Add(bytesIn);
-                        if (bytesIn < DLThreshold)
+
+                        videoMOSUplinkBuffer += bytesIn;
+                        if(videoMOSUplinkCycle == 5)
                         {
-                            DLThresholdArray.Add(false);
+                            DLArray.Add(videoMOSUplinkBuffer/5);
+
+                            if (videoMOSUplinkBuffer/5 < DLThreshold)
+                            {
+                                DLThresholdArray.Add(false);
+                            }
+                            else
+                            {
+                                DLThresholdArray.Add(true);
+                            }
+                            videoMOSUplink = videoMOSUplinkBuffer/5;
+                            videoMOSUplinkBuffer = 0;
+                            videoMOSUplinkCycle = 0;
+
                         }
-                        else
+                        if (videoMOSStallingCycle  == 30)
                         {
-                            DLThresholdArray.Add(true);
+                            if (DLThresholdArray.Count >= 6)
+                            {
+                                lastBufferingIntervals = 0;
+                                for (int i = 0; i < 6; i++)
+                                {
+                                    if (DLThresholdArray[DLThresholdArray.Count -1 - i])
+                                        lastBufferingIntervals++;
+                                }  
+                            }
                         }
+                        videoMOSStallingCycle++;
+                        videoMOSUplinkCycle++;
+                       
+
                         bytesInTotal += bytesIn;
                         bytesIn = 0;
                         bytesOut = 0;
@@ -327,23 +358,31 @@ namespace Packet_analyzer
 
             //считаем sView
             double sStalling = 0;
-            if(DLThresholdArray.Count > 20)
+            if(DLThresholdArray.Count > 12)
             {
+                string intervals = "|";
                 int bufferingIntervals = 0;
-                int totalIntervals = (DLThresholdArray.Count-10)/10;
+                int totalIntervals = (DLThresholdArray.Count-6)/6;
                 for(int i = 1; i <= totalIntervals; i++)
                 {
                     int b = 0;
-                    for(int j = 0; j < 10; j++)
+                    for(int j = 0; j < 6; j++)
                     {
-                        if(!DLThresholdArray[i + j])
+                        if(DLThresholdArray[i + j])
                             b++;
                     }
-                    if(b > 5)
+                    if(b > 3)
+                    {
                         bufferingIntervals++;
+                        intervals += "1|";
+                    }
+                    else
+                        intervals += "0|";
                 }
                 sStalling = bufferingIntervals/totalIntervals * 100;
                 sView = 5;
+                logText("inervals:" + intervals);
+                logText("sStalling: (" + bufferingIntervals + "/" + totalIntervals +")*100% = " + sStalling);
                 if (sStalling >= 5 ) sView = 4;
                 if (sStalling >= 10) sView = 3;
                 if (sStalling >= 15) sView = 2;
@@ -360,7 +399,7 @@ namespace Packet_analyzer
             if (avgDownlink >= 5000000) sQuality = 4.78;
             if (avgDownlink >= 6000000) sQuality = 5;
 
-            //считаем sInteraction
+            //считаем sInteraction - не работает, теперь всегда 2
             int bufferingSec = 0;
             if (DLThresholdArray.Count > 10)
             {
@@ -371,6 +410,7 @@ namespace Packet_analyzer
                     else
                         bufferingSec++;
                 }
+                bufferingSec = 3; 
                 sInteraction = 5;
                 if (bufferingSec >= 1) sInteraction = 3;
                 if (bufferingSec >= 2) sInteraction = 2;
